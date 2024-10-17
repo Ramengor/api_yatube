@@ -2,6 +2,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from .constants import TITLE_LENGTH
+
 User = get_user_model()
 
 
@@ -14,7 +16,7 @@ class Group(models.Model):
 
     def __str__(self):
         """Возвращает заголовок группы в виде строки."""
-        return self.title[:30]
+        return self.title[:TITLE_LENGTH]
 
 
 class Post(models.Model):
@@ -51,7 +53,7 @@ class Post(models.Model):
 
     def __str__(self):
         """Возвращает текст поста."""
-        return self.text[:30]
+        return self.text[:TITLE_LENGTH]
 
 
 class Comment(models.Model):
@@ -74,6 +76,5 @@ class Comment(models.Model):
 
     def __str__(self):
         """Возвращает текст комментария."""
-        post_title = self.post.text[:30]
-        author_name = self.author.username
-        return f'{post_title} - {author_name} - {self.text[:30]}'
+        return (f'{self.post} - {self.author.username}'
+                f' - {self.text[:TITLE_LENGTH]}')

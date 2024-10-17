@@ -1,20 +1,12 @@
 """Модуль представлений (views) для API."""
-from rest_framework import viewsets, permissions
 from django.shortcuts import get_object_or_404
+
+from rest_framework import permissions, viewsets
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from posts.models import Post, Comment, Group
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
-
-
-class IsAuthorOrReadOnly(permissions.BasePermission):
-    """Разрешает доступ только автору для редактирования и удаления."""
-
-    def has_object_permission(self, request, view, obj):
-        """Проверяет авторизован ли пользователь."""
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return obj.author == request.user
+from posts.models import Comment, Group, Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -44,7 +36,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Возвращает комментарии для указанного поста."""
         post = self.get_post()
-        return Comment.objects.filter(post=post)
+        return post.comments.all()
 
     def perform_create(self, serializer):
         """Сохраняет новый комментарий с автором и постом."""

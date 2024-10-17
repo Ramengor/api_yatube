@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from .views import PostViewSet, CommentViewSet, GroupViewSet
+from .views import CommentViewSet, GroupViewSet, PostViewSet
 
 v1_router = DefaultRouter()
 v1_router.register('posts', PostViewSet, basename='posts')
