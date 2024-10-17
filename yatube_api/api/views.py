@@ -1,15 +1,14 @@
 """Модуль представлений (views) для API."""
 from rest_framework import viewsets, permissions
-from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from posts.models import Post, Comment, Group
-from api.serializers import PostSerializer, GroupSerializer, CommentSerializer
+from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
-    """Разрешает доступ только автору для редактирования и удаления"""
+    """Разрешает доступ только автору для редактирования и удаления."""
 
     def has_object_permission(self, request, view, obj):
         """Проверяет авторизован ли пользователь."""
@@ -29,19 +28,6 @@ class PostViewSet(viewsets.ModelViewSet):
         """Сохраняет новый пост с автором, указанным в запросе."""
         serializer.save(author=self.request.user)
 
-    # def perform_update(self, serializer):
-    #     """Обновляет существующий пост."""
-    #     post = self.get_object()
-    #     if post.author != self.request.user:
-    #         raise PermissionDenied('Вы не можете редактировать чужие посты.')
-    #     serializer.save()
-    #
-    # def perform_destroy(self, instance):
-    #     """Удаляет пост, проверяя, что пользователь является его автором."""
-    #     if instance.author != self.request.user:
-    #         raise PermissionDenied('Вы не можете удалить чужой пост.')
-    #     instance.delete()
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с комментариями."""
@@ -57,30 +43,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Возвращает комментарии для указанного поста."""
-        # post_id = self.kwargs['post_id']
         post = self.get_post()
         return Comment.objects.filter(post=post)
 
     def perform_create(self, serializer):
         """Сохраняет новый комментарий с автором и постом."""
-        # post_id = self.kwargs['post_id']
         post = self.get_post()
         serializer.save(author=self.request.user, post=post)
-
-    # def perform_update(self, serializer):
-    #     """Обновляет существующий комментарий."""
-    #     comment = self.get_object()
-    #     if comment.author != self.request.user:
-    #         raise PermissionDenied(
-    #             'Вы не можете редактировать чужие комментарии.'
-    #         )
-    #     serializer.save()
-    #
-    # def perform_destroy(self, instance):
-    #     """Удаляет комментарий."""
-    #     if instance.author != self.request.user:
-    #         raise PermissionDenied('Вы не можете удалить чужой комментарий.')
-    #     instance.delete()
 
 
 class GroupViewSet(ReadOnlyModelViewSet):
